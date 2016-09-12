@@ -27,7 +27,7 @@ class Bot():
 	def schedule_update(self):
 		while True:
 			self.get_updates()
-			time.sleep(20)
+			time.sleep(10)
 		
 		
 	def get_updates(self):		
@@ -64,14 +64,14 @@ class Bot():
 		#the events from raati15 calendar for the next 10 days
 		events = []
 		events = self.calendar_client.get_calendar_events(10)
-		print(events)
+		#print(events)
 		#events is like  [('2016-09-11T12:30:00+03:00', u'test event')]
 		if events:
 			#removing aakkoset
 			ascii_events = [(x[0],x[1].encode('ascii', 'xmlcharrefreplace').replace('&#228;', 'a') ) for x in events]
 			#filtering only paapaivat
 			only_paapaivas = [x for x in ascii_events if 'paa' in x[1].lower() and 'paiva' in x[1].lower() ]
-			print(only_paapaivas)
+			#print(only_paapaivas)
 			for paiva in only_paapaivas:
 				#date parsing
 				stripped_date = paiva[0][0:10]
@@ -79,8 +79,8 @@ class Bot():
 				#if today is paapaiva
 				now = datetime.datetime.utcnow()
 				today =   now - datetime.timedelta(minutes=now.minute, hours=now.hour, seconds=now.second, microseconds=now.microsecond)
-				print(calendar_date)
-				print(today)
+				#print(calendar_date)
+				#print(today)
 				if calendar_date == today:					
 					return "TANAAN!!"
 				else:

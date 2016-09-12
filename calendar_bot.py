@@ -84,10 +84,10 @@ class CalendarClient():
         in_ten_days =today + datetime.timedelta(days=show_days)
         in_ten_days_str = in_ten_days.isoformat() + 'Z'
         
-        print('Getting the upcoming events for the next {} days'.format(show_days))
-        #calendarId='2a668f5qv3pmvn251mviqlc6vk@group.calendar.google.com'
+        #print('Getting the upcoming events for the next {} days'.format(show_days))
+        
         eventsResult = self.service.events().list(
-           calendarId='primary' , timeMin=today_str,timeMax=in_ten_days_str, singleEvents=True,
+           calendarId='2a668f5qv3pmvn251mviqlc6vk@group.calendar.google.com' , timeMin=today_str,timeMax=in_ten_days_str, singleEvents=True,
             orderBy='startTime').execute()
         events = eventsResult.get('items', [])
         event_list = []
