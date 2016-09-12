@@ -6,8 +6,6 @@ import datetime
 import time
 
 from sets import Set
-from poster.encode import multipart_encode
-from poster.streaminghttp import register_openers
 
 from calendar_bot import CalendarClient
 
@@ -16,13 +14,15 @@ class Bot():
 	
 	def __init__(self):
 		self.botid = '268119392:AAErkOPlFBVJIG7Yc_L2m-IzRA0f67tz7qg'
-		self.tanaan_photo = 'tanaan.jpg'
-		self.tanaan_photo_address = 'sticker_203328635170455598.webp'
+		self.tanaan_photo_address = 'http://i.imgur.com/XsVZzpy.jpg'
+		self.calendar_id = '2a668f5qv3pmvn251mviqlc6vk@group.calendar.google.com' #id for raati 15 calendar
+		#self.calendar_id = 'primary'
 		#not responding twice to one command
 		self.command_ids_set = Set([])
-		self.calendar_client = CalendarClient()
-		self.schedule_update()
+		self.calendar_client = CalendarClient(self.calendar_id)
 		print("initializing telegram bot")
+		self.schedule_update()
+
 		
 	def schedule_update(self):
 		while True:
@@ -48,14 +48,10 @@ class Bot():
 			message = latest_command['message']['text']
 			if len(message) > 1:
 				message = message[1:]
-			#print("chat id: {}".format(chat_id))
-			#print("message_type: {}".format(message_type))
-			#print("message_id: {}".format(message_id))
-			#print("message: {}".format(message))
 			if message == 'paapaiva' and message_id not in self.command_ids_set:
 				self.command_ids_set.add(message_id)
 				self.paapaiva(chat_id)
-			print("got updates, no new ones")
+			#print("got updates, no new ones")
 	
 	'''returns 'TANAAN!!' if today is paapaiva and string for something else
 		returns None if no paapaiva in next 10 days
@@ -96,38 +92,41 @@ class Bot():
 			self.send_message("Seuraava PAAPAIVA on:\n" + paapaiva, chat_id)
 			if paapaiva == "TANAAN!!":
 				pass
-				#self.send_photo(self.tanaan_photo_address, chat_id)
+				self.send_photo(self.tanaan_photo_address, chat_id)
 		else:	
 			self.send_message("Seuraava PAAPAIVA on:\n" + "Ei PAAPAIVAA seuraavaan 10 paivaan :(", chat_id)
 			
-	#needs work		
-	def send_photo(self, tanaan_photo, chat_id):
-		register_openers()
-
-		with open(self.tanaan_photo, 'r') as f:
-			datagen, headers = multipart_encode({"file": f})
+			
+	#could save the photo id on the telegram server and use it but whatever
+	def send_photo(self, photo, chat_id):
     
-		url = 'https://api.telegram.org/bot{}/sendMessage'.format(self.botid)
+		url = 'https://api.telegram.org/bot{}/sendPhoto'.format(self.botid)
 		values = {'chat_id' : chat_id,
-                  'photo' : datagen}
-        
-		data = urllib.urlencode(values)
-		req = urllib2.Request(url, data)
-		response = urllib2.urlopen(req)
-		the_page = response.read()        
+                  'photo' : photo}
+		try:
+			data = urllib.urlencode(values)
+			req = urllib2.Request(url, data)
+			response = urllib2.urlopen(req)
+			the_page = response.read()   
+		except ValueError: 
+			print('ValueError in sendphoto')
 	
-	
+	#sends a post http request to the bot api to send a string message to a chat
 	def send_message(self, message, chat_id):
     
 		url = 'https://api.telegram.org/bot{}/sendMessage'.format(self.botid)
 		values = {'chat_id' : chat_id,
                   'text' : message }
-        
-		data = urllib.urlencode(values)
-		req = urllib2.Request(url, data)
-		response = urllib2.urlopen(req)
-		the_page = response.read()
-		#print(the_page)
+                  
+		try:
+			data = urllib.urlencode(values)
+			req = urllib2.Request(url, data)
+			response = urllib2.urlopen(req)
+			the_page = response.read()
+		except ValueError:
+			print('ValueError in sendmessage')
+		
+
 			
 		
 		

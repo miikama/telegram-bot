@@ -24,9 +24,10 @@ APPLICATION_NAME = 'Google Calendar API'
 class CalendarClient():
 
     
-    def __init__(self):
+    def __init__(self, calendar):
         self.credentials = None
         self.service = None
+        self.calendar = calendar
     
     def get_credentials(self):
         """Gets valid user credentials from storage.
@@ -85,9 +86,9 @@ class CalendarClient():
         in_ten_days_str = in_ten_days.isoformat() + 'Z'
         
         #print('Getting the upcoming events for the next {} days'.format(show_days))
-        
+        #2a668f5qv3pmvn251mviqlc6vk@group.calendar.google.com
         eventsResult = self.service.events().list(
-           calendarId='2a668f5qv3pmvn251mviqlc6vk@group.calendar.google.com' , timeMin=today_str,timeMax=in_ten_days_str, singleEvents=True,
+           calendarId=self.calendar , timeMin=today_str,timeMax=in_ten_days_str, singleEvents=True,
             orderBy='startTime').execute()
         events = eventsResult.get('items', [])
         event_list = []
