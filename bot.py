@@ -15,6 +15,7 @@ class Bot():
 	def __init__(self):
 		self.botid = '268119392:AAErkOPlFBVJIG7Yc_L2m-IzRA0f67tz7qg'
 		self.tanaan_photo_address = 'http://i.imgur.com/XsVZzpy.jpg'
+		self.fugee_rooriin_address = 'http://i.imgur.com/ykFysmr.jpg'
 		self.calendar_id = '2a668f5qv3pmvn251mviqlc6vk@group.calendar.google.com' #id for raati 15 calendar
 		#self.calendar_id = 'primary'
 		#not responding twice to one command
@@ -48,9 +49,13 @@ class Bot():
 			message = latest_command['message']['text']
 			if len(message) > 1:
 				message = message[1:]
-			if message == 'paapaiva' and message_id not in self.command_ids_set:
-				self.command_ids_set.add(message_id)
-				self.paapaiva(chat_id)
+			if message_id not in self.command_ids_set:
+				if message == 'paapaiva' 
+					self.command_ids_set.add(message_id)
+					self.paapaiva(chat_id)
+				elif message == 'fugee':
+					self.command_ids_set.add(message_id)
+					self.sendPhoto(self.fugee_rooriin_address, self.chat_id)
 			#print("got updates, no new ones")
 	
 	'''returns 'TANAAN!!' if today is paapaiva and string for something else
