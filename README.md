@@ -1,9 +1,10 @@
 # telegram-bot
 
-This bot is written in python, packages required are: google-api-python-client, poster
-can be installed with 
+This bot is written in python, packages required are: google-api-python-client and poster
 
-pip install --upgrade google-api-python-client
+They can be installed with 
+
+pip install - -upgrade google-api-python-client
 
 Instructions for setting up the google client for the calendar can be found here
 https://developers.google.com/google-apps/calendar/quickstart/python
