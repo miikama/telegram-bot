@@ -27,7 +27,7 @@ class Bot():
 	def schedule_update(self):
 		while True:
 			self.get_updates()
-			time.sleep(10)
+			time.sleep(8)
 		
 		
 	def get_updates(self):		
