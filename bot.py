@@ -50,12 +50,12 @@ class Bot():
 			if len(message) > 1:
 				message = message[1:]
 			if message_id not in self.command_ids_set:
-				if message == 'paapaiva' 
+				if message == 'paapaiva':
 					self.command_ids_set.add(message_id)
 					self.paapaiva(chat_id)
 				elif message == 'fugee':
 					self.command_ids_set.add(message_id)
-					self.sendPhoto(self.fugee_rooriin_address, self.chat_id)
+					self.send_photo(self.fugee_rooriin_address, chat_id)
 			#print("got updates, no new ones")
 	
 	'''returns 'TANAAN!!' if today is paapaiva and string for something else
