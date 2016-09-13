@@ -27,9 +27,13 @@ class Bot():
 		
 	def schedule_update(self):
 		while True:
-			self.get_updates()
-			time.sleep(5)
-		
+			try:
+				self.get_updates()
+				time.sleep(5)
+			except Exception as ex:
+				template = "An exception of type {0} occured. Arguments:\n{1!r}"
+				message = template.format(type(ex).__name__, ex.args)
+				print message
 		
 	def get_updates(self):		
 		#returns infor url to socket
