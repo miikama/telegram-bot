@@ -13,17 +13,19 @@ from calendar_bot import CalendarClient
 class Bot():	
 	
 	def __init__(self):
+		self.error_counter = 0
 		self.botid = '268119392:AAErkOPlFBVJIG7Yc_L2m-IzRA0f67tz7qg'
-		self.tanaan_photo_address = 'http://i.imgur.com/XsVZzpy.jpg'
-		self.fugee_rooriin_address = 'http://i.imgur.com/ykFysmr.jpg'
+		#self.tanaan_photo_address = 'http://i.imgur.com/XsVZzpy.jpg'
+		self.tanaan_photo_address = 'AgADBAADfHg0G3UbZAcegVWNbNN83i9WYRkABByIWcSOPr6COtoAAgI'
+		#self.fugee_rooriin_address = 'http://i.imgur.com/ykFysmr.jpg'
+		self.fugee_rooriin_address = 'AgADBAADrnY0G4UdZAdaw2r9UebvDepcYRkABGDopfSFk_Knz90AAgI'
 		self.calendar_id = '2a668f5qv3pmvn251mviqlc6vk@group.calendar.google.com' #id for raati 15 calendar
 		#self.calendar_id = 'primary'
 		#not responding twice to one command
 		self.command_ids_set = Set([])
 		self.calendar_client = CalendarClient(self.calendar_id)
 		print("initializing telegram bot")
-		self.schedule_update()
-
+		self.schedule_update()	
 		
 	def schedule_update(self):
 		while True:
@@ -31,9 +33,15 @@ class Bot():
 				self.get_updates()
 				time.sleep(5)
 			except Exception as ex:
-				template = "An exception of type {0} occured. Arguments:\n{1!r}"
-				message = template.format(type(ex).__name__, ex.args)
-				print message
+				if self.error_counter < 50:
+					self.error_counter +=1
+					template = "An exception of type {0} occured. Arguments:\n{1!r}"
+					message = template.format(type(ex).__name__, ex.args)
+					print message
+				else:
+					break
+
+			
 		
 	def get_updates(self):		
 		#returns infor url to socket
@@ -46,21 +54,22 @@ class Bot():
 		#if result ok, continue
 		if data['ok']:
 			result = data['result']
-			latest_command = result[-1]
-			chat_id = latest_command['message']['chat']['id']
-			message_type = latest_command['message']['entities'][0]['type']
-			message_id = latest_command['message']['message_id']
-			message = latest_command['message']['text']
-			if len(message) > 1:
-				message = message[1:]
-			if message_id not in self.command_ids_set:
-				if message == 'paapaiva':
-					self.command_ids_set.add(message_id)
-					self.paapaiva(chat_id)
-				elif message == 'fugee':
-					self.command_ids_set.add(message_id)
-					self.send_photo(self.fugee_rooriin_address, chat_id)
-			#print("got updates, no new ones")
+			if result:
+				latest_command = result[-1]
+				chat_id = latest_command['message']['chat']['id']
+				message_type = latest_command['message']['entities'][0]['type']
+				message_id = latest_command['message']['message_id']
+				message = latest_command['message']['text']
+				if len(message) > 1:
+					message = message[1:]
+				if message_id not in self.command_ids_set:
+					if message == 'paapaiva':
+						self.command_ids_set.add(message_id)
+						self.paapaiva(chat_id)
+					elif message == 'fugee':
+						self.command_ids_set.add(message_id)
+						self.send_photo(self.fugee_rooriin_address, chat_id)
+				#print("got updates, no new ones")
 	
 	'''returns 'TANAAN!!' if today is paapaiva and string for something else
 		returns None if no paapaiva in next 10 days
@@ -116,7 +125,8 @@ class Bot():
 			data = urllib.urlencode(values)
 			req = urllib2.Request(url, data)
 			response = urllib2.urlopen(req)
-			the_page = response.read()   
+			the_page = response.read()
+			#pprint.pprint(the_page)   
 		except ValueError: 
 			print('ValueError in sendphoto')
 	
@@ -140,7 +150,8 @@ class Bot():
 		
 		
 	
-bot = Bot()		
+bot = Bot()	
+#bot.get_updates()	
 		
 #bot = Bot()	
 #bot.get_updates()
