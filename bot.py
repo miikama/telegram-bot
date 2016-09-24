@@ -39,8 +39,8 @@ class Bot():
 					time.sleep(600)
 				else:
 					break
-			except urllib2.HTTPError:
-				print "HTTPError occured, counter: " + str(self.error_counter) + " at time: " + datetime.datetime.utcnow().strftime("%d/%m/%y %H:%M")
+			except urllib2.HTTPError as err:
+				print "HTTPError occured with code " + str(err.code) ", counter: " + str(self.error_counter) + " at time: " + datetime.datetime.utcnow().strftime("%d/%m/%y %H:%M")
 				if self.error_counter < 50:
 					self.error_counter +=1
 					time.sleep(600)
