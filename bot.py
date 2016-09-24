@@ -32,6 +32,20 @@ class Bot():
 			try:
 				self.get_updates()
 				time.sleep(5)
+			except urllib2.URLError:
+				print "URLError occured, counter: " + str(self.error_counter) + " at time: " + datetime.datetime.utcnow().strftime("%d/%m/%y %H:%M")
+				if self.error_counter < 50:
+					self.error_counter +=1
+					time.sleep(600)
+				else:
+					break
+			except urllib2.HTTPError:
+				print "HTTPError occured, counter: " + str(self.error_counter) + " at time: " + datetime.datetime.utcnow().strftime("%d/%m/%y %H:%M")
+				if self.error_counter < 50:
+					self.error_counter +=1
+					time.sleep(600)
+				else:
+					break
 			except Exception as ex:
 				if self.error_counter < 50:
 					self.error_counter +=1
@@ -40,7 +54,7 @@ class Bot():
 					print message
 				else:
 					break
-
+			
 			
 		
 	def get_updates(self):		
