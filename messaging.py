@@ -1,131 +1,32 @@
-import urllib
-import urllib2
+import telebot
 import pprint
-import json
-import datetime
-import time
 
-from sets import Set
+bot = telebot.TeleBot('270442436:AAGR2t_5DNyWwU01k9SzBgCRf9OXl_gVdoc')
 
-from calendar_bot import CalendarClient
+send_bot = telebot.TeleBot('270442436:AAGR2t_5DNyWwU01k9SzBgCRf9OXl_gVdoc')
 
+sissas_chat = '-175861996'
+test_lara = "-169286463"
 
-class Bot():	
+@bot.message_handler(commands=['write'])
+def send_welcome(message):
+	try: bot.send_message(test_lara, message.text.split(" ")[1:])
+	except Exception as ex: pass
+
+@bot.message_handler(func=lambda message:  True)
+def all_echo(message):
+	try: bot.forward_message(sissas_chat, test_lara, message.message_id)
+	except Exception as ex:	pass
 	
-	def __init__(self):
-		self.error_counter = 0
-		self.botid = '268119392:AAErkOPlFBVJIG7Yc_L2m-IzRA0f67tz7qg'
-		#self.tanaan_photo_address = 'http://i.imgur.com/XsVZzpy.jpg'
-		self.tanaan_photo_address = 'AgADBAADfHg0G3UbZAcegVWNbNN83i9WYRkABByIWcSOPr6COtoAAgI'
-		#self.fugee_rooriin_address = 'http://i.imgur.com/ykFysmr.jpg'
-		self.fugee_rooriin_address = 'AgADBAADrnY0G4UdZAdaw2r9UebvDepcYRkABGDopfSFk_Knz90AAgI'
-		self.calendar_id = '2a668f5qv3pmvn251mviqlc6vk@group.calendar.google.com' #id for raati 15 calendar
-		#self.calendar_id = 'primary'
-		#not responding twice to one command
-		self.command_ids_set = Set([])
-		self.calendar_client = CalendarClient(self.calendar_id)
-		print("initializing telegram bot")
-		self.schedule_update()	
-		
-	def schedule_update(self):
-		while True:
-			try:
-				self.get_updates()
-				time.sleep(5)
-			except urllib2.URLError:
-				print "URLError occured, counter: " + str(self.error_counter) + " at time: " + datetime.datetime.utcnow().strftime("%d/%m/%y %H:%M")
-				if self.error_counter < 50:
-					self.error_counter +=1
-					time.sleep(600)
-				else:
-					break
-			except urllib2.HTTPError as err:
-				print "HTTPError occured with code " + str(err.code) + ", counter: " + str(self.error_counter) + " at time: " + datetime.datetime.utcnow().strftime("%d/%m/%y %H:%M")
-				if self.error_counter < 50:
-					self.error_counter +=1
-					time.sleep(600)
-				else:
-					break
-			except Exception as ex:
-				if self.error_counter < 50:
-					self.error_counter +=1
-					template = "An exception of type {0} occured. Arguments:\n{1!r}"
-					message = template.format(type(ex).__name__, ex.args)
-					print message
-				else:
-					break
-          
-          
-	#the method for checking if the bot has been given a command	
-	def get_updates(self):		
-		#returns infor url to socket
-		response = urllib2.urlopen('https://api.telegram.org/bot{}/getUpdates'.format(self.botid))
-		#reads the data in the url (JSON response)
-		html = response.read()
-		#decoding JSON
-		data = json.loads(html)
-		#pprint.pprint(data)
-		#if result ok, continue
-		if data['ok']:
-			result = data['result']
-			if result:
-				latest_command = result[-1]
-				chat_id = latest_command['message']['chat']['id']
-				message_type = latest_command['message']['entities'][0]['type']
-				message_id = latest_command['message']['message_id']
-				message = latest_command['message']['text']
-				if len(message) > 1:
-					message = message[1:]
-				if message_id not in self.command_ids_set:
-					if message == 'paapaiva':
-						self.command_ids_set.add(message_id)
-						self.paapaiva(chat_id)
-					elif message == 'fugee':
-						self.command_ids_set.add(message_id)
-						self.send_photo(self.fugee_rooriin_address, chat_id)
-				#print("got updates, no new ones")
-	
-	
-			
-	#could save the photo id on the telegram server and use it but whatever
-	def send_photo(self, photo, chat_id):
+@bot.message_handler(func=lambda message:  True)
+def all_echo(message):
+	try: bot.forward_message(sissas_chat, test_lara, message.message_id)
+	except Exception as ex:	pass
     
-		url = 'https://api.telegram.org/bot{}/sendPhoto'.format(self.botid)
-		values = {'chat_id' : chat_id,
-                  'photo' : photo}
-		try:
-			data = urllib.urlencode(values)
-			req = urllib2.Request(url, data)
-			response = urllib2.urlopen(req)
-			the_page = response.read()
-			#pprint.pprint(the_page)   
-		except ValueError: 
-			print('ValueError in sendphoto')
-	
-	#sends a post http request to the bot api to send a string message to a chat
-	def send_message(self, message, chat_id):
+#@bot.message_handler(func=lambda message: str(message.chat.id) == test_lara)
+#def all_echo(message):
+#    bot.send_message(sissas_chat, test_lara, message.message_id) 
     
-		url = 'https://api.telegram.org/bot{}/sendMessage'.format(self.botid)
-		values = {'chat_id' : chat_id,
-                  'text' : message }
-                  
-		try:
-			data = urllib.urlencode(values)
-			req = urllib2.Request(url, data)
-			response = urllib2.urlopen(req)
-			the_page = response.read()
-		except ValueError:
-			print('ValueError in sendmessage')
-		
 
-			
-		
-		
-	
-bot = Bot()	
-#bot.get_updates()	
-		
-#bot = Bot()	
-#bot.get_updates()
-#print(bot.is_paapaiva())
 
+bot.polling()
