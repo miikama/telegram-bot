@@ -47,13 +47,10 @@ class Bot():
 				else:
 					break
 			except Exception as ex:
-				if self.error_counter < 50:
-					self.error_counter +=1
-					template = "An exception of type {0} occured. Arguments:\n{1!r}"
-					message = template.format(type(ex).__name__, ex.args)
-					print message
-				else:
-					break
+				template = "An exception of type {0} occured. Arguments:\n{1!r}"
+				message = template.format(type(ex).__name__, ex.args)
+				print message
+
 			
 			
 		
@@ -67,23 +64,24 @@ class Bot():
 		#pprint.pprint(data)
 		#if result ok, continue
 		if data['ok']:
+			pprint.pprint(data['result'])
 			result = data['result']
 			if result:
 				latest_command = result[-1]
-				chat_id = latest_command['message']['chat']['id']
-				message_type = latest_command['message']['entities'][0]['type']
-				message_id = latest_command['message']['message_id']
-				message = latest_command['message']['text']
-				if len(message) > 1:
-					message = message[1:]
-				if message_id not in self.command_ids_set:
-					if message == 'paapaiva':
-						self.command_ids_set.add(message_id)
-						self.paapaiva(chat_id)
-					elif message == 'fugee':
-						self.command_ids_set.add(message_id)
-						self.send_photo(self.fugee_rooriin_address, chat_id)
-				#print("got updates, no new ones")
+				if('entities' in latest_command['message']):
+					chat_id = latest_command['message']['chat']['id']
+					message_id = latest_command['message']['message_id']
+					message = latest_command['message']['text']
+					if len(message) > 1:
+						message = message[1:]
+					if message_id not in self.command_ids_set:
+						if message == 'paapaiva':
+							self.command_ids_set.add(message_id)
+							self.paapaiva(chat_id)
+						elif message == 'fugee':
+							self.command_ids_set.add(message_id)
+							self.send_photo(self.fugee_rooriin_address, chat_id)			 				
+				
 	
 	'''returns 'TANAAN!!' if today is paapaiva and string for something else
 		returns None if no paapaiva in next 10 days
@@ -146,6 +144,8 @@ class Bot():
 	
 	#sends a post http request to the bot api to send a string message to a chat
 	def send_message(self, message, chat_id):
+	
+		print("message" + str(message) + " chat_id: " + str(chat_id))
     
 		url = 'https://api.telegram.org/bot{}/sendMessage'.format(self.botid)
 		values = {'chat_id' : chat_id,
