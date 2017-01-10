@@ -6,6 +6,7 @@ import datetime
 import time
 
 from sets import Set
+import logging
 
 from calendar_bot import CalendarClient
 
@@ -24,6 +25,10 @@ class Bot():
 		#not responding twice to one command
 		self.command_ids_set = Set([])
 		self.calendar_client = CalendarClient(self.calendar_id)
+		
+		
+		logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',level=logging.INFO)
+		
 		print("initializing telegram bot")
 		self.schedule_update()	
 		
@@ -120,7 +125,6 @@ class Bot():
 		if paapaiva:
 			self.send_message("Seuraava PAAPAIVA on:\n" + paapaiva, chat_id)
 			if paapaiva == "TANAAN!!":
-				pass
 				self.send_photo(self.tanaan_photo_address, chat_id)
 		else:	
 			self.send_message("Seuraava PAAPAIVA on:\n" + "Ei PAAPAIVAA seuraavaan 10 paivaan :(", chat_id)
