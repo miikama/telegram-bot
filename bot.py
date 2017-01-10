@@ -64,7 +64,6 @@ class Bot():
 		#pprint.pprint(data)
 		#if result ok, continue
 		if data['ok']:
-			pprint.pprint(data['result'])
 			result = data['result']
 			if result:
 				latest_command = result[-1]
