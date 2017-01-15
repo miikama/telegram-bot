@@ -50,8 +50,8 @@ from telegram.error import (TelegramError, Unauthorized, BadRequest, TimedOut, C
 from telegram.ext import CommandHandler		
 from telegram.ext import Updater
 
-tanaan_photo_address = 'AgADBAADJtU1G48ZZAcGpKYHgqzgUGVgoBkABLo_3nC4mppbfiIAAgI' # 'http://i.imgur.com/2k3j2NA.jpg' 
-fugee_rooriin_address ='AgADBAADGtQ1G34eZAcXNmZf3T9F5ihaoBkABPvL9BQqG2o4lSEAAgI' #'http://i.imgur.com/ykFysmr.jpg'
+tanaan_photo_address = 'AgADBAADBeY1G5sdZAeZOQAB_xifyPymVaAZAARU0-rzUc8xq5I8AAIC' # 'http://i.imgur.com/2k3j2NA.jpg' 
+fugee_rooriin_address ='AgADBAADKeI1G1caZAeDNH-tzcHDX8VYoBkABKVGDyIMeSxuQz0AAgI' #'http://i.imgur.com/ykFysmr.jpg'
 ei_tanaan_address = 'AgADBAADLNM1GxUdZAfdLhEdfQINz65boBkABN7nsRV8UWIQwSAAAgI' #'http://i.imgur.com/nxkzkpW.jpg'
 calendar_id = '2a668f5qv3pmvn251mviqlc6vk@group.calendar.google.com' #id for raati 15 calendar
 calendar_client = CalendarClient(calendar_id)
@@ -83,13 +83,12 @@ def paapaiva(bot, update):
 		
 #fugee
 def fugee(bot, update):
-	msg = bot.sendPhoto(chat_id=update.message.chat_id, photo=fugee_rooriin_address) 
-	#pprint.pprint("sent photo id: " + msg.photo[0].file_id)
+	msg = bot.sendPhoto(chat_id=update.message.chat_id, photo=fugee_rooriin_address)
 	
 #ei
 def ei(bot, update):
 	msg = bot.sendPhoto(chat_id=update.message.chat_id, photo=ei_tanaan_address) 
-	pprint.pprint("sent photo id: " + msg.photo[0].file_id)
+	#pprint.pprint("sent photo id: " + msg.photo[0].file_id)
 	
 #error handling	
 def error_callback(bot, update, error):
@@ -124,5 +123,8 @@ dispatcher.add_error_handler(error_callback)		#error handler
 			
 updater.start_polling(poll_interval = 2.0, clean = True)
 
+
+
+#curl -s -X POST "https://api.telegram.org/bot268119392:AAErkOPlFBVJIG7Yc_L2m-IzRA0f67tz7qg/sendPhoto" -F chat_id=89456514 -F photo="http://i.imgur.com/2k3j2NA.jpg"
 
 
