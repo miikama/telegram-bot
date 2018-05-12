@@ -23,7 +23,7 @@ EVENT_QUERY_INTERVAL = 120 #days
 
 #settting up the telegram bot and logging to standard output
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',level=logging.ERROR)
-botid = '571698879:AAHEMNKj6EJ1Z2TNxSfONE7GYo7mtdecwws'
+botid = 'tempname'
 updater = Updater(token=botid)
 dispatcher = updater.dispatcher
 
