@@ -174,6 +174,24 @@ class KonklaaviDriveClient():
         event_str += ". " + events[0][1]
 
         return event_str
+
+    def get_shared_point_players(self,nplayers, values):
+
+        if len(values) == 0:
+            return
+
+        temp = values[0:nplayers]
+        prevpoints = int(values[0][1])
+        for ind, player in enumerate(values):
+            if ind < nplayers:
+                prevpoints = int(values[ind][1])
+                continue
+            if int(values[ind][1]) == prevpoints:
+                temp.append(values[ind])
+            else:
+                break
+
+        return temp
     
 
     def get_league_points(self, nplayers):
@@ -184,7 +202,7 @@ class KonklaaviDriveClient():
             return
 
         range_end = 20
-        if nplayers > 0: range_end = nplayers+1
+        if nplayers > 0: range_end = nplayers+4
         range_start = 1
         range_len = range_end - range_start +1
         got_all_players = False
@@ -192,7 +210,7 @@ class KonklaaviDriveClient():
         #request range_len rows at a time, sheets.get() only returns
         # nonempty rows so continue as long as something is obtained
         while not got_all_players and len(values) < nplayers+1:
-            RANGE_NAME = SHEET_NAME+'!A'+str(range_start)+':B'+str(range_end)
+            RANGE_NAME = SHEET_NAME+'!A'+str(range_start)+':C'+str(range_end)
             result = self.sheets_service.spreadsheets().values().get(spreadsheetId=self.sheet_id,
                                                  range=RANGE_NAME).execute()
             val = result.get('values', [])
@@ -208,12 +226,14 @@ class KonklaaviDriveClient():
         #values have format [ ["pname", "points"], ["pname2", "points2"],...]
         if not values:
             return None
-        else:
-            values = values[1:]            
-#            for i, row in enumerate(values):
-                #print( "{} {}".format(row[0], row[1]) )
-                #make the points integers
-            return values
+
+        values = values[1:]   
+
+        if nplayers > 0:
+            values = self.get_shared_point_players(nplayers, values)         
+
+        
+        return values
         
     def get_league_points_str(self, nplayers):
 
@@ -221,13 +241,11 @@ class KonklaaviDriveClient():
         name_and_points_list = []
         #get all players
 
-        if nplayers == 0:
-            name_and_points_list = self.get_league_points(0)                    
-        else:
-            name_and_points_list = self.get_league_points(nplayers)
+        name_and_points_list = self.get_league_points(nplayers)                    
 
+        stats_str += "(pelit - pisteet)\n"
         for row in name_and_points_list: 
-                stats_str += row[0] +": " + row[1] + "\n"
+                stats_str += row[0] +": " +row[2] + "-" + row[1] + "\n"
 
         return stats_str
         
@@ -241,6 +259,8 @@ class KonklaaviDriveClient():
 #print("formattted events")
 
 #print(cl.get_formatted_event_str(30))
+
+#print(cl.get_league_points_str(0) )
 
 #print(cl.get_league_points_str(3) )
 
