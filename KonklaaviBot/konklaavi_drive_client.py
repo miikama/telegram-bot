@@ -175,6 +175,12 @@ class KonklaaviDriveClient():
 
         return event_str
 
+    ''' function to get n first players from values. 
+        But if n+1 players has same amount of points 
+        return players until the next player has less points
+        @params: @nplayers: number of wanted players (min # of returned players)
+                    @values: list of [ [player, points]]
+    '''
     def get_shared_point_players(self,nplayers, values):
 
         if len(values) == 0:
@@ -193,47 +199,95 @@ class KonklaaviDriveClient():
 
         return temp
     
-
-    def get_league_points(self, nplayers):
+    def fetch_sheet_data(self):
 
         if self.sheets_service == None:
              self.sheets_service = self.connect_sheets()
         if self.sheets_service == None:
             return
 
-        range_end = 20
-        if nplayers > 0: range_end = nplayers+4
         range_start = 1
-        range_len = range_end - range_start +1
+        range_len = 20
+        range_end = range_start + range_len -1
         got_all_players = False
-        values = []
+        
+        data = []
         #request range_len rows at a time, sheets.get() only returns
         # nonempty rows so continue as long as something is obtained
-        while not got_all_players and len(values) < nplayers+1:
-            RANGE_NAME = SHEET_NAME+'!A'+str(range_start)+':C'+str(range_end)
+        while not got_all_players:
+            #RANGE_NAME = SHEET_NAME+'!A'+str(range_start)+':C'+str(range_end)
+            RANGE_NAME = SHEET_NAME+'!H'+str(range_start)+':I'+str(range_end)
             result = self.sheets_service.spreadsheets().values().get(spreadsheetId=self.sheet_id,
                                                  range=RANGE_NAME).execute()
             val = result.get('values', [])
             if len(val) < 1:
                 got_all_players = True
             else:
-                values +=  val 
+                data +=  val 
             range_start = range_end +1
             range_end = range_end + range_len
 
+        return data
 
+    ''' return only players data with [ ['player', point], ...]
+    '''
+    def filter_sheet_data(self, data):
+        filtered_data = []
+        #format 
+        for entry in data:
+            #if the number next to the player is valid, entry is deemed valid
+            try:
+                points = float(entry[1])
+                ent = [entry[0], points]
+                filtered_data.append(ent)
+            except ValueError:
+                continue
+            except IndexError:
+                continue
 
-        #values have format [ ["pname", "points"], ["pname2", "points2"],...]
-        if not values:
-            return None
+        return filtered_data
 
-        values = values[1:]   
+    '''receives [ ['player', point], ...] with duplicate players
+        return duplicates summed into one [ ['player', points, games], ...]
+    '''
+    def calculate_season_scores(self, players):
+        data = {}
+
+        for player in players:
+            pname = player[0]
+            if pname in data:
+                pdata = data[pname]                
+                points = pdata[1]
+                games = pdata[2]
+                data[pname] = [pname, points + player[1], games + 1,]
+            else:
+                data[pname] = [pname, player[1], 1]
+
+        sorted_data = sorted(data.values(), key = lambda x: x[1], reverse=True )
+        return sorted_data
+
+    def get_league_points(self, nplayers):
+
+        #get unfiltered data from sheets
+        values = self.fetch_sheet_data()
+        #filter sheet data 
+        players = self.filter_sheet_data(values)        
+        #calculate total points and games for a single player
+        season_data = self.calculate_season_scores(players)
+        
+        #debug
+        #for dat in season_data:
+        #    print(u"{},{},{}".format(dat[0],int(dat[1]), int(dat[2]) ))
+
+        #season_data has format [ ["pname", "points", "games"], ["pname2", "points2","games2"],...]
+        if len(season_data) < 1:
+            return None  
 
         if nplayers > 0:
-            values = self.get_shared_point_players(nplayers, values)         
+            season_data = self.get_shared_point_players(nplayers, season_data)         
 
         
-        return values
+        return season_data
         
     def get_league_points_str(self, nplayers):
 
@@ -245,7 +299,7 @@ class KonklaaviDriveClient():
 
         stats_str += "(pelit - pisteet)\n"
         for row in name_and_points_list: 
-                stats_str += row[0] +": " +row[2] + "-" + row[1] + "\n"
+                stats_str += u"{}: {}-{}\n".format(row[0],int(row[2]),int(row[1]))
 
         return stats_str
         
@@ -261,6 +315,9 @@ class KonklaaviDriveClient():
 #print(cl.get_formatted_event_str(30))
 
 #print(cl.get_league_points_str(0) )
+#print(cl.get_league_points_str(7) )
 
-#print(cl.get_league_points_str(3) )
+#print(cl.fetch_sheet_data() )
+
+
 
